@@ -1,0 +1,150 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@libs7//:BUILD.bzl", "BASE_COPTS")
+load("@libs7//lib:BUILD.bzl", "clibgen_runner")
+
+load("//:BUILD.bzl",
+     "BASE_SRCS",
+     "LIBLOG_CC_VERSION",
+     "CJSON_S7_VERSION", "CJSON_VERSION",
+     "LIBS7_VERSION")
+
+SRCS = BASE_SRCS + ["@libs7//src:s7.h"]
+INCLUDE_PATHS = [
+    "-Iconfig",
+    "-Iexternal/cjson~{}/config".format(CJSON_S7_VERSION),
+    "-Iexternal/libs7~{}/src".format(LIBS7_VERSION),
+    "-Iexternal/cjson~{}/include".format(CJSON_VERSION),
+    "-Iexternal/liblog_cc~{}/src".format(LIBLOG_CC_VERSION),
+    # when built within libs7 repo, these are needed:
+    "-Isrc", "-Ilib"
+]
+COPTS         = BASE_COPTS + INCLUDE_PATHS
+DEPS          = [
+    "@liblog_cc//src:logc",
+    "@libs7//src:s7",
+    # "@libs7//lib:utils",
+    "@cjson//:cjson"
+]
+
+
+# load("//:BUILD.bzl", "BASE_SRCS", "BASE_DEPS",
+#      "BASE_COPTS", "BASE_INCLUDE_PATHS", "BASE_DEFINES", "BASE_LINKOPTS",
+#      "LIBS7_VERSION",
+#      "CJSON_VERSION")
+
+# load("//lib:BUILD.bzl", "clibgen_runner",
+#      "CLIB_SRCS", "CLIB_INCLUDE_PATHS", "CLIB_COPTS", "CLIB_LINKOPTS")
+
+# SRCS          = BASE_SRCS + CLIB_SRCS
+# INCLUDE_PATHS = BASE_INCLUDE_PATHS + CLIB_INCLUDE_PATHS + [
+#     "-Iexternal/libs7~{}/lib".format(LIBS7_VERSION),
+#     "-Iexternal/libs7~{}/src".format(LIBS7_VERSION),
+#     "-Iexternal/cjson~{}".format(CJSON_VERSION),
+# ]
+# COPTS         = BASE_COPTS + CLIB_COPTS + INCLUDE_PATHS
+# DEPS          = BASE_DEPS + ["//src:s7", "@cjson//:cjson"]
+DEFINES       = [] #BASE_DEFINES
+LINKOPTS      = [] # BASE_LINKOPTS + CLIB_LINKOPTS
+
+################################################################
+cc_library(
+    name  = "cjson_s7",
+    linkstatic = True,
+    alwayslink = True, # ensure init fn sym available for dlsym
+    srcs  = SRCS + ["libcjson_s7.c"],
+    hdrs = ["libcjson_s7.h"], # "cJSON.h"],
+    deps  = DEPS + [
+        "@libs7//lib:utils",
+        ":cjson_map", "cjson_array"
+    ],
+    copts = COPTS + [
+        "-Iexternal/libs7~{}/lib".format(LIBS7_VERSION),
+    ] + select({
+        "@platforms//os:macos": [
+            # "-Wno-gnu-statement-expression"
+        ],
+        "@platforms//os:linux": [
+    ],
+        "//conditions:default": []
+    }),
+    linkopts      = LINKOPTS,
+    local_defines = DEFINES
+)
+
+cc_shared_library(
+    name  = "cjson_s7_dso",
+    shared_lib_name = select({
+        "@platforms//os:macos": "libcjson_s7.dylib",
+        "@platforms//os:linux": "libcjson_s7.so",
+        # "@platforms//os:windows": "libcjson_s7.dll",
+        "//conditions:default": "libcjson_s7.so"
+    }),
+    deps = [":cjson_s7"]
+
+    # linkshared = True,
+    # srcs  = SRCS + [
+    #     ":libcjson_s7.c",
+    #     ":libcjson_s7.h",
+    #     # "//src:s7.h",
+    #     "//lib:utils.h",
+    #     "//lib:utils.c",
+    # ],
+    # deps  = DEPS + ["//lib:utils"], # "//vendored/cjson"],
+    # copts = COPTS + [
+    #     "-Ilib", "-Iexternal/libs7/lib",
+    #     "-Ilib/libjson", "-Iexternal/libs7/lib/libjson",
+    #     # "-Ivendored/cjson", "-Iexternal/libs7/vendored/cjson",
+    # ],
+    # linkopts      = LINKOPTS,
+    # local_defines = DEFINES
+)
+
+# clibgen_runner(
+#     name = "libcjson_s7_runbin",
+#     args = ["--script", "$(location libcjson_clibgen.scm)"],
+#     srcs = [":libcjson_clibgen.scm"],
+#     outs = [":libcjson_s7.c"]
+# )
+
+################################################################
+cc_library(
+    name  = "cjson_array",
+    linkstatic = True,
+    alwayslink = True, # ensure init fn sym available for dlsym
+    srcs  = SRCS + [
+        "cjson_array_s7.c", # "cjson_array_s7.h",
+        "libcjson_s7.h",
+    ],
+    deps  = DEPS + [
+        # "//vendored/cjson",
+        # "//src:s7",
+    ],
+    copts = COPTS + [
+        # "-Ivendored/cjson",
+        # "-Iexternal/libs7/vendored/cjson"
+    ],
+    linkopts      = LINKOPTS,
+    local_defines = DEFINES
+)
+
+cc_library(
+    name  = "cjson_map",
+    linkstatic = True,
+    alwayslink = True, # ensure init fn sym available for dlsym
+    srcs  = SRCS + [
+        "cjson_map_s7.c",
+        "libcjson_s7.h",
+    ],
+    deps  = DEPS + [
+        # "//vendored/cjson",
+        # "//src:s7",
+    ],
+    copts = COPTS + [
+        # "-Ivendored/cjson",
+        # "-Iexternal/libs7/vendored/cjson",
+    ],
+    linkopts      = LINKOPTS,
+    local_defines = DEFINES
+)
+
