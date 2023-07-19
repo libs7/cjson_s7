@@ -1,0 +1,5 @@
+bazel_dep(name = "cjson_s7")
+local_path_override(
+    module_name = "cjson_s7",
+    path = "..",
+)
