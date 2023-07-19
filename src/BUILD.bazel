@@ -1,27 +1,31 @@
 package(default_visibility = ["//visibility:public"])
 
-load("@libs7//:BUILD.bzl", "BASE_COPTS")
 load("@libs7//lib:BUILD.bzl", "clibgen_runner")
 
 load("//:BUILD.bzl",
-     "BASE_SRCS",
+     "BASE_SRCS", "BASE_DEPS",
+     "BASE_COPTS", "BASE_INCLUDE_PATHS",
+     "BASE_DEFINES", "BASE_LINKOPTS",
+     "LIBS7_VERSION",
      "LIBLOG_CC_VERSION",
-     "CJSON_S7_VERSION", "CJSON_VERSION",
-     "LIBS7_VERSION")
+     "CJSON_S7_VERSION", "CJSON_VERSION")
 
-SRCS = BASE_SRCS + ["@libs7//src:s7.h"]
+#BASE_SRCS +
+SRCS = ["@libs7//src:s7.h"]
 INCLUDE_PATHS = [
     "-Iconfig",
-    "-Iexternal/cjson~{}/config".format(CJSON_S7_VERSION),
     "-Iexternal/libs7~{}/src".format(LIBS7_VERSION),
+    "-Iexternal/libs7~{}/config".format(LIBS7_VERSION),
+    "-Iexternal/cjson~{}/config".format(CJSON_S7_VERSION),
     "-Iexternal/cjson~{}/include".format(CJSON_VERSION),
     "-Iexternal/liblog_cc~{}/src".format(LIBLOG_CC_VERSION),
     # when built within libs7 repo, these are needed:
-    "-Isrc", "-Ilib"
+    # "-Isrc", "-Ilib"
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
 DEPS          = [
     "@liblog_cc//src:logc",
+    # "@libs7//config:hdrs",
     "@libs7//src:s7",
     # "@libs7//lib:utils",
     "@cjson//:cjson"

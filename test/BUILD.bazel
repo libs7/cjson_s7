@@ -1,11 +1,8 @@
 load("@rules_cc//cc:defs.bzl", "cc_test")
 
-load("@libs7//:BUILD.bzl",
-     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
-     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS")
-     # "CJSON_S7_VERSION")
-
 load("//:BUILD.bzl",
+     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
+     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS",
      "GOPT_VERSION",
      "UNITY_VERSION",
      "UTHASH_VERSION")
@@ -15,6 +12,12 @@ SRCS          = BASE_SRCS + [
     "@libs7//src:libs7.h"
 ]
 
+DEPS          = BASE_DEPS + [
+    "//src:cjson_s7",
+    "@gopt//:gopt",
+    "@unity//src:unity",
+    "@uthash//src:uthash",
+]
 INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Isrc",
     "-Iexternal/gopt~{}/src".format(GOPT_VERSION),
@@ -22,13 +25,6 @@ INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
     "-Iexternal/uthash~{}/src".format(UTHASH_VERSION)
 ]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
-DEPS          = BASE_DEPS + [
-    "//src:cjson_s7",
-    "@libs7//src:s7", # always statically link libs7 for tests???
-    "@gopt//:gopt",
-    "@unity//src:unity",
-    "@uthash//src:uthash",
-]
 DEFINES       = BASE_DEFINES
 LINKOPTS      = BASE_LINKOPTS
 
