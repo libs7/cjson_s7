@@ -13,7 +13,6 @@ SRCS          = BASE_SRCS + [
 ]
 
 DEPS          = BASE_DEPS + [
-    "//src:cjson_s7",
     "@gopt//:gopt",
     "@unity//src:unity",
     "@uthash//src:uthash",
@@ -36,20 +35,36 @@ TAGS = ["json"]
 test_suite(
     name  = "test",
     tests = [
-        ":array_to_scm",
-        ":arrays",
-        ":readers",
-        ":map_to_scm",
-        ":maps",
+        ":array_to_scm_test",
+        # ":array_to_scm_dso_static_test",
+        ":arrays_test",
+        ":readers_test",
+        ":map_to_scm_test",
+        ":maps_test",
         # ":strings",
     ]
 )
 
 ################################################################
 cc_test(
-    name = "array_to_scm",
+    name = "array_to_scm_test",
     linkstatic = True,
     srcs = SRCS + ["json_array_to_scm_test.c"],
+    local_defines = DEFINES,
+    deps = DEPS + ["//src:cjson_s7"],
+    copts = COPTS,
+    linkopts = LINKOPTS,
+    timeout = TIMEOUT,
+    tags = TAGS + ["arrays", "conversion"]
+)
+
+cc_test(
+    name = "array_to_scm_dso_static_test",
+    linkstatic = True,
+    srcs = SRCS + [
+        "json_array_to_scm_test.c",
+    ],
+    data = ["//src:cjson_s7_dso"],
     local_defines = DEFINES,
     deps = DEPS,
     copts = COPTS,
@@ -59,11 +74,11 @@ cc_test(
 )
 
 cc_test(
-    name = "arrays",
+    name = "arrays_test",
     linkstatic = True,
     srcs = SRCS + ["json_arrays_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
+    deps = DEPS + ["@cjson_s7//src:cjson_s7"],
     copts = COPTS,
     linkopts = LINKOPTS,
     timeout = TIMEOUT,
@@ -71,14 +86,11 @@ cc_test(
 )
 
 cc_test(
-    name = "map_to_scm",
+    name = "map_to_scm_test",
     linkstatic = True,
     srcs = SRCS + ["json_map_to_scm_test.c"],
     local_defines = DEFINES,
-    deps = DEPS + [
-        # "//dev",
-        # "//lib/libjson:json_s7"
-    ],
+    deps = DEPS + ["@cjson_s7//src:cjson_s7"],
     copts = COPTS,
     linkopts = LINKOPTS,
     timeout = TIMEOUT,
@@ -86,11 +98,11 @@ cc_test(
 )
 
 cc_test(
-    name = "maps",
+    name = "maps_test",
     linkstatic = True,
     srcs = SRCS + ["json_maps_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
+    deps = DEPS + ["//src:cjson_s7"],
     copts = COPTS,
     linkopts = LINKOPTS,
     timeout = TIMEOUT,
@@ -98,11 +110,11 @@ cc_test(
 )
 
 cc_test(
-    name = "readers",
+    name = "readers_test",
     linkstatic = True,
     srcs = SRCS + ["json_readers_test.c"],
     local_defines = DEFINES,
-    deps = DEPS,
+    deps = DEPS + ["//src:cjson_s7"],
     data = ["//test/data:json"],
     copts = COPTS,
     linkopts = LINKOPTS,

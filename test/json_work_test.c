@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 {
     s7 = initialize("work", argc, argv);
 
-    libs7_load_clib(s7, "json");
+    libs7_load_clib(s7, "cjson");
 
     UNITY_BEGIN();
 

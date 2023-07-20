@@ -513,8 +513,8 @@ static s7_pointer json_cJSON_IsRaw(s7_scheme *sc, s7_pointer args)
   return(s7_unspecified(sc));
 }
 
-s7_pointer libjson_s7_init(s7_scheme *s7);
-s7_pointer libjson_s7_init(s7_scheme *s7)
+s7_pointer libcjson_s7_init(s7_scheme *s7);
+s7_pointer libcjson_s7_init(s7_scheme *s7)
 {
     TRACE_ENTRY(libcjson_s7_init);
     s7_pointer cur_env;

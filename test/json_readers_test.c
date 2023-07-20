@@ -174,7 +174,7 @@ int main(int argc, char **argv)
 {
     s7 = initialize("interpolation", argc, argv);
 
-    libs7_load_clib(s7, "json");
+    libs7_load_clib(s7, "cjson");
 
     json_read = s7_name_to_value(s7, "json:read");
 
