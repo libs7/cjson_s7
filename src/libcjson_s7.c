@@ -5,12 +5,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "config.h"
-#include "utils.h"
+#include "log.h"
+
 #include "libcjson_s7.h"
-/* #include "cJSON.h" */
-/* #include "libjson_s7.h" */
-/* #include "libs7.h" */
 
 #if defined(DEVBUILD)
 char *cjson_types[256] = {
@@ -38,11 +35,11 @@ static s7_pointer char___symbol, cJSON__symbol;
 /* **************************************************************** */
 
 /* -------- cJSON_Version -------- */
-s7_pointer json_cjson_version(s7_scheme *sc, s7_pointer args)
-{
-    (void)args;
-    return(s7_make_string(sc, (char*)cJSON_Version()));
-}
+/* s7_pointer json_cjson_version(s7_scheme *sc, s7_pointer args) */
+/* { */
+/*     (void)args; */
+/*     return(s7_make_string(sc, (char*)cJSON_Version())); */
+/* } */
 
 /* -------- json_is_datum -------- */
 /* JSON root item may be any json value - object, vector, string, etc.
@@ -50,7 +47,7 @@ s7_pointer json_cjson_version(s7_scheme *sc, s7_pointer args)
 */
 static s7_pointer json_is_datum(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(json_is_datum);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -68,33 +65,42 @@ static s7_pointer json_is_datum(s7_scheme *s7, s7_pointer args)
  */
 static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_read);
+    TRACE_ENTRY;
     /* TRACE_S7_DUMP("args", args); */
     s7_pointer p, arg;
-    char* json_str;
+    const char* json_str;
 
     //FIXME: call cjsonx_read
 
+    s7_pointer s7_length = s7_name_to_value(s7, "length");
+    s7_pointer s7_read_string = s7_name_to_value(s7, "read-string");
+
     if (args == s7_nil(s7)) {
         /* log_debug("null args"); */
-        char buf[2 * 4096]; //FIXME: support arbitrary s len
-        int i = 0;
-        /* read from current-input-port, one char at a time */
-        s7_pointer cip = s7_current_input_port(s7);
+        s7_pointer p = s7_current_input_port(s7);
+        s7_pointer len = s7_call(s7, s7_length, s7_list(s7, 1, p));
+        s7_pointer js = s7_call(s7, s7_read_string,
+                                s7_list(s7, 2, len, p));
+        json_str = s7_string(js);
 
-        //FIXME: use same code to read cip, file, and string ports
+        /* char buf[2 * 4096]; //FIXME: support arbitrary s len */
+        /* int i = 0; */
+        /* /\* read from current-input-port, one char at a time *\/ */
+        /* s7_pointer cip = s7_current_input_port(s7); */
 
-        s7_pointer c;
-        while (true) {
-            c = s7_read_char(s7, cip);
-            if (c == s7_eof_object(s7)) {
-                buf[i] = '\0';
-                break;
-            }
-            buf[i++] = s7_character(c);
-        }
-        /* log_debug("readed string: %s", buf); */
-        json_str = buf;
+        /* //FIXME: use same code to read cip, file, and string ports */
+
+        /* s7_pointer c; */
+        /* while (true) { */
+        /*     c = s7_read_char(s7, cip); */
+        /*     if (c == s7_eof_object(s7)) { */
+        /*         buf[i] = '\0'; */
+        /*         break; */
+        /*     } */
+        /*     buf[i++] = s7_character(c); */
+        /* } */
+        /* /\* log_debug("readed string: %s", buf); *\/ */
+        /* json_str = buf; */
     } else {
         p = args;
         arg = s7_car(p);
@@ -105,7 +111,12 @@ static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
         if (s7_is_input_port(s7, arg)) {
             TRACE_LOG_DEBUG("read arg is input port", "");
 
-            json_str = libs7_input_port_to_c_string(s7, arg);
+            /* json_str = libs7_input_port_to_c_string(s7, arg); */
+            s7_pointer len = s7_call(s7, s7_length,
+                                     s7_list(s7, 1, arg));
+            s7_pointer js = s7_call(s7, s7_read_string,
+                                    s7_list(s7, 2, len, arg));
+            json_str = s7_string(js);
 
         }
         else if (s7_is_string(arg)) {
@@ -139,7 +150,7 @@ static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
 /* -------- json_read_file -------- */
 s7_pointer json_read_file(s7_scheme *s7, char *fname)
 {
-    TRACE_ENTRY(json_read_file);
+    TRACE_ENTRY;
     log_debug("json file: %s", fname);
     (void)fname;
 
@@ -175,7 +186,7 @@ s7_pointer json_read_file(s7_scheme *s7, char *fname)
 // We do not use this, use json_read instead
 /* static s7_pointer json_cJSON_Parse(s7_scheme *s7, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_Parse); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     char* json_str; */
 /*     p = args; */
@@ -303,7 +314,7 @@ static s7_pointer json_cJSON_Print(s7_scheme *sc, s7_pointer args)
 /* /\* -------- cJSON_GetObjectItem -------- *\/ */
 /* static s7_pointer json_cJSON_GetObjectItem(s7_scheme *sc, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_GetObjectItem); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     p = args; */
 /*     arg = s7_car(p);              /\* arg 0: cJSON *object *\/ */
@@ -327,7 +338,7 @@ static s7_pointer json_cJSON_Print(s7_scheme *sc, s7_pointer args)
 /* /\* -------- cJSON_GetObjectItemCaseSensitive -------- *\/ */
 /* static s7_pointer json_cJSON_GetObjectItemCaseSensitive(s7_scheme *sc, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_GetObjectItemCaseSensitive); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     p = args; */
 /*     arg = s7_car(p);              /\* arg 0: cJSON *object *\/ */
@@ -351,7 +362,7 @@ static s7_pointer json_cJSON_Print(s7_scheme *sc, s7_pointer args)
 /* /\* -------- cJSON_HasObjectItem -------- *\/ */
 /* static s7_pointer json_cJSON_HasObjectItem(s7_scheme *s7, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_HasObjectItem); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     p = args; */
 /*     arg = s7_car(p);              /\* arg 0: cJSON *object *\/ */
@@ -516,7 +527,7 @@ static s7_pointer json_cJSON_IsRaw(s7_scheme *sc, s7_pointer args)
 s7_pointer libcjson_s7_init(s7_scheme *s7);
 s7_pointer libcjson_s7_init(s7_scheme *s7)
 {
-    TRACE_ENTRY(libcjson_s7_init);
+    TRACE_ENTRY;
     s7_pointer cur_env;
     {
         s7_pointer t, b, x, s, d, i;
@@ -670,11 +681,12 @@ s7_pointer libcjson_s7_init(s7_scheme *s7)
 
     s7_define_constant(s7, "*json:version*",
                        s7_make_string(s7, (char*)cJSON_Version()));
-    s7_define(s7, cur_env,
-              s7_make_symbol(s7, "json:Version"),
-              s7_make_typed_function(s7, "json:version",
-                                     json_cjson_version, 0, 0, false,
-                                     "json:version", pl_st));
+    /* s7_define(s7, cur_env, */
+    /*           s7_make_symbol(s7, "json:version"), */
+    /*           s7_make_typed_function(s7, "json:version", */
+    /*                                  json_cjson_version, 0, 0, false, */
+    /*                                  "json:version", pl_st)); */
+
     s7_set_shadow_rootlet(s7, old_shadow);
 
     return(cur_env);

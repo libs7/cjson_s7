@@ -3,11 +3,11 @@
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
-#include "config.h"
-
-#include "common.h"
 
 #include "libs7.h"
+
+#include "macros.h"
+#include "s7plugin_test_config.h"
 
 s7_scheme *s7;
 

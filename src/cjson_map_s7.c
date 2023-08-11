@@ -6,9 +6,14 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "config.h"
+#include "log.h"
 
-#include "libcjson_s7.h"
+#if INTERFACE
+#include "cJSON.h"
+#include "libs7.h"
+#endif
+
+#include "cjson_map_s7.h"
 
 int json_object_type_tag = 0;
 
@@ -23,7 +28,7 @@ static s7_pointer string_string;
  *****************************************************************/
 static s7_pointer json_is_map(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(json_is_map);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -45,7 +50,7 @@ static s7_pointer json_is_map(s7_scheme *s7, s7_pointer args)
 /* returns list */
 s7_pointer g_json_object_keys(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_object_keys);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -98,7 +103,7 @@ s7_pointer g_json_object_keys(s7_scheme *s7, s7_pointer args)
 /* returns list */
 s7_pointer json_object_values(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(json_object_vals);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -111,7 +116,7 @@ s7_pointer json_object_values(s7_scheme *s7, s7_pointer args)
 /* -------- cJSON_GetObjectItemCaseSensitive -------- */
 /* static s7_pointer json_cJSON_GetObjectItemCaseSensitive(s7_scheme *sc, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_GetObjectItemCaseSensitive); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     p = args; */
 /*     arg = s7_car(p);              /\* arg 0: cJSON *object *\/ */
@@ -133,7 +138,7 @@ s7_pointer json_object_values(s7_scheme *s7, s7_pointer args)
 
 s7_pointer g_json_object_contains(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_object_contains);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);            /* arg 0: json obj */
@@ -176,7 +181,7 @@ s7_pointer g_json_object_contains(s7_scheme *s7, s7_pointer args)
 /* -------- cJSON_HasObjectItem -------- */
 /* static s7_pointer json_cJSON_HasObjectItem(s7_scheme *s7, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_HasObjectItem); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     p = args; */
 /*     arg = s7_car(p);              /\* arg 0: cJSON *object *\/ */
@@ -208,7 +213,7 @@ s7_pointer g_json_object_contains(s7_scheme *s7, s7_pointer args)
 static s7_pointer free_json_object(s7_scheme *s7, s7_pointer obj)
 {
     (void)s7;
-    TRACE_ENTRY(free_json_object);
+    TRACE_ENTRY;
     free(s7_c_object_value(obj));
     return(NULL);
 }
@@ -225,14 +230,14 @@ static s7_pointer mark_json_object(s7_scheme *s7, s7_pointer obj)
 static s7_pointer json_object_is_equal(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_is_equal);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_object_is_equivalent(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_is_equivalent);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
@@ -243,7 +248,7 @@ static s7_pointer json_object_is_equivalent(s7_scheme *s7, s7_pointer args)
  */
 s7_pointer g_json_object_ref(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_object_ref);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);            /* arg 0: json obj */
@@ -391,7 +396,7 @@ s7_pointer g_json_object_ref(s7_scheme *s7, s7_pointer args)
 /* -------- cJSON_GetObjectItem -------- */
 /* static s7_pointer json_cJSON_GetObjectItem(s7_scheme *sc, s7_pointer args) */
 /* { */
-/*     TRACE_ENTRY(json_cJSON_GetObjectItem); */
+/*     TRACE_ENTRY; */
 /*     s7_pointer p, arg; */
 /*     p = args; */
 /*     arg = s7_car(p);              /\* arg 0: cJSON *object *\/ */
@@ -415,13 +420,13 @@ s7_pointer g_json_object_ref(s7_scheme *s7, s7_pointer args)
 static s7_pointer json_object_set(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 s7_pointer g_json_object_length(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_object_length);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -440,21 +445,21 @@ s7_pointer g_json_object_length(s7_scheme *s7, s7_pointer args)
 static s7_pointer json_object_copy(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_object_fill(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_object_reverse(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
@@ -462,7 +467,7 @@ static s7_pointer json_object_reverse(s7_scheme *s7, s7_pointer args)
 // to_string implementation
 char *json_object_to_string(s7_scheme *s7, const cJSON *jo)
 {
-    TRACE_ENTRY(json_object_to_string);
+    TRACE_ENTRY;
 
     const int BUFSZ = 4096;
     char *buf;          /* WARNING: malloc */
@@ -686,7 +691,7 @@ char *json_object_to_string(s7_scheme *s7, const cJSON *jo)
 
 static s7_pointer g_json_object_to_string(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_object_to_string);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -704,14 +709,14 @@ static s7_pointer g_json_object_to_string(s7_scheme *s7, s7_pointer args)
 static s7_pointer json_object_getter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_getter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_object_setter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_object_setter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
@@ -722,13 +727,13 @@ static s7_pointer json_object_setter(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_json_object_to_alist(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_json_object_to_alist);
+    TRACE_ENTRY;
     return s7_f(s7);
 }
 
 static s7_pointer g_json_object_to_hash_table(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_object_to_hash_table);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -744,7 +749,7 @@ static s7_pointer g_json_object_to_hash_table(s7_scheme *s7, s7_pointer args)
 
 void json_object_init(s7_scheme *s7, s7_pointer cur_env)
 {
-    TRACE_ENTRY(json_object_init);
+    TRACE_ENTRY;
     json_object_type_tag = s7_make_c_type(s7, "json_object");
     /* TRACE_LOG_DEBUG("JSON_OBJECT_TAG: %d", json_object_type_tag); */
 
@@ -834,7 +839,7 @@ void json_object_init(s7_scheme *s7, s7_pointer cur_env)
 /* WARNING WARNING: we convert keys to s7 keywords */
 s7_pointer json_map_to_hash_table(s7_scheme *s7, cJSON *jm, bool clone)
 {
-    TRACE_ENTRY(json_map_to_hash_table);
+    TRACE_ENTRY;
     (void)clone;
 
     int key_ct = cJSON_GetArraySize(jm);

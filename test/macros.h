@@ -1,17 +1,10 @@
-#ifndef TEST_COMMON_H
-#define TEST_COMMON_H
+#ifndef _MACROS_H
+#define _MACROS_H
+
+#include "trace_dev.h"
 
 #include "gopt.h"
 #include "libs7.h"
-
-void print_usage(char *test);
-
-void set_options(char *test, struct option options[]);
-
-void print_debug_env(void);
-
-s7_scheme *initialize(char *test, int argc, char **argv);
-
 #define DQ3 "\"\"\""
 #define SQ3 "'''"
 

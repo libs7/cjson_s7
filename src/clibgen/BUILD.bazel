@@ -1,0 +1,9 @@
+load("@s7_tools//src:RULES.bzl", "clibgen")
+
+clibgen(
+    name = "clibgen",
+    args = ["--script", "$(location libcjson_clibgen.scm)"],
+    srcs = [":libcjson_clibgen.scm"],
+    outs = [":libcjson_s7.c"]
+)
+

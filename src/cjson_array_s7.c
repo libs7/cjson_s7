@@ -1,5 +1,3 @@
-#include "config.h"
-
 #include <errno.h>
 #include <math.h>
 #include <stddef.h>
@@ -8,12 +6,20 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "libcjson_s7.h"
+#include "log.h"
+
+#if INTERFACE
+#include "cJSON.h"
+#include "libs7.h"
+#endif
+
+#include "cjson_array_s7.h"
 
 int json_array_type_tag = 0;
 
+extern s7_pointer pl_tx, pl_xi, pl_xx;
+
 static s7_pointer string_string;
-/* c_pointer_string, character_string, boolean_string, real_string, complex_string, */
 
 /* ****************************************************************
  * Public Scheme API for cJSON.h array (array) operations
@@ -21,7 +27,7 @@ static s7_pointer string_string;
 /* -------- cjson_is_array -------- */
 static s7_pointer g_json_is_array(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_is_array);
+    TRACE_ENTRY;;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -41,7 +47,7 @@ static s7_pointer g_json_is_array(s7_scheme *s7, s7_pointer args)
 static s7_pointer free_json_array(s7_scheme *s7, s7_pointer obj)
 {
     (void)s7;
-    TRACE_ENTRY(free_json_array);
+    TRACE_ENTRY;;
     free(s7_c_object_value(obj));
     return(NULL);
 }
@@ -59,7 +65,7 @@ static s7_pointer json_array_is_equal(s7_scheme *s7, s7_pointer args)
 {
     (void)s7;
     (void)args;
-    TRACE_ENTRY(json_array_is_equal);
+    TRACE_ENTRY;;
     return s7_nil(s7);
 }
 
@@ -67,7 +73,7 @@ static s7_pointer json_array_is_equivalent(s7_scheme *s7, s7_pointer args)
 {
     (void)s7;
     (void)args;
-    TRACE_ENTRY(json_array_is_equivalent);
+    TRACE_ENTRY;;
     return s7_nil(s7);
 }
 
@@ -78,7 +84,7 @@ static s7_pointer json_array_is_equivalent(s7_scheme *s7, s7_pointer args)
  */
 s7_pointer g_json_array_ref(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_array_ref);
+    TRACE_ENTRY;;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);            /* arg 0: json obj */
@@ -167,13 +173,13 @@ static s7_pointer json_array_set(s7_scheme *s7, s7_pointer args)
 {
     (void)s7;
     (void)args;
-    TRACE_ENTRY(json_array_set);
+    TRACE_ENTRY;;
     return s7_nil(s7);
 }
 
 s7_pointer g_json_array_length(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_array_length);
+    TRACE_ENTRY;;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -192,27 +198,27 @@ s7_pointer g_json_array_length(s7_scheme *s7, s7_pointer args)
 static s7_pointer json_array_copy(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_array_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_array_fill(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_array_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_array_reverse(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_array_set);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
-static s7_pointer g_json_array_to_vector(s7_scheme *s7, s7_pointer args)
+EXPORT s7_pointer g_json_array_to_vector(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_array_to_vector);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -227,7 +233,7 @@ static s7_pointer g_json_array_to_vector(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_json_array_to_list(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(g_json_array_to_list);
+    TRACE_ENTRY;
     return s7_f(s7);
 }
 
@@ -235,7 +241,7 @@ static s7_pointer g_json_array_to_list(s7_scheme *s7, s7_pointer args)
 // to_string implementations
 char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
 {
-    TRACE_ENTRY(json_array_to_string);
+    TRACE_ENTRY;
 
     const int BUFSZ = 4096;
     char *buf;          /* WARNING: malloc */
@@ -454,7 +460,7 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
 
 static s7_pointer g_json_array_to_string(s7_scheme *s7, s7_pointer args)
 {
-    TRACE_ENTRY(g_json_array_to_string);
+    TRACE_ENTRY;
     s7_pointer p, arg;
     p = args;
     arg = s7_car(p);
@@ -472,20 +478,20 @@ static s7_pointer g_json_array_to_string(s7_scheme *s7, s7_pointer args)
 static s7_pointer json_array_getter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_array_getter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 static s7_pointer json_array_setter(s7_scheme *s7, s7_pointer args)
 {
     (void)args;
-    TRACE_ENTRY(json_array_setter);
+    TRACE_ENTRY;
     return s7_nil(s7);
 }
 
 void json_array_init(s7_scheme *s7, s7_pointer cur_env)
 {
-    TRACE_ENTRY(json_array_init);
+    TRACE_ENTRY;
     json_array_type_tag = s7_make_c_type(s7, "json_array");
     /* TRACE_LOG_DEBUG("JSON_ARRAY_TAG: %d", json_array_type_tag); */
 
@@ -569,7 +575,7 @@ void json_array_init(s7_scheme *s7, s7_pointer cur_env)
  */
 s7_pointer json_array_to_vector(s7_scheme *s7, cJSON *ja, bool clone)
 {
-    TRACE_ENTRY(json_array_to_vector);
+    TRACE_ENTRY;
     size_t idx_ct = cJSON_GetArraySize(ja);
     s7_pointer the_vector = s7_make_vector(s7, idx_ct);
     cJSON *item;
