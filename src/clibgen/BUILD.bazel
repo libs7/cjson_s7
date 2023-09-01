@@ -1,4 +1,4 @@
-load("@s7_tools//src:RULES.bzl", "clibgen")
+load("@libs7//plugin:RULES.bzl", "clibgen")
 
 clibgen(
     name = "clibgen",

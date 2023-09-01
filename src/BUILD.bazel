@@ -1,6 +1,7 @@
 load("@makeheaders//src:RULES.bzl", "makeheaders")
+load("@libs7//plugin:MACROS.bzl", "s7_plugin", "s7_library")
 
-load("//config/cc:BUILD.bzl",
+load("//config/cc:CONFIG.bzl",
      "BASE_SRCS", "BASE_DEPS",
      "BASE_COPTS", "BASE_INCLUDE_PATHS",
      "BASE_DEFINES", "BASE_LINKOPTS")
@@ -17,10 +18,8 @@ TOOLCHAINS = ["//:repo_paths"]
 exports_files(["trace_dev.h"]) # for testing
 
 ################################################################
-cc_library(
+s7_plugin(
     name          = "cjson_s7",
-    linkstatic    = True,
-    alwayslink    = True,
     srcs          = SRCS + ["libcjson_s7.c", ":mkhdrs"],
     hdrs          = ["cjson_s7.h"],
     deps          = DEPS + [":cjson_map", ":cjson_array"],
@@ -44,7 +43,7 @@ cc_shared_library(
 )
 
 ################################################################
-cc_library(
+s7_library(
     name          = "cjson_array",
     linkstatic    = True,
     srcs          = SRCS + ["cjson_array_s7.c", ":mkhdrs"],
@@ -55,7 +54,7 @@ cc_library(
     toolchains    = TOOLCHAINS,
 )
 
-cc_library(
+s7_library(
     name          = "cjson_map",
     linkstatic    = True,
     srcs          = SRCS + ["cjson_map_s7.c", ":mkhdrs"],
@@ -74,9 +73,8 @@ makeheaders(
         "cjson_array_s7.c",
         "cjson_map_s7.c"
     ],
-    additional_srcs  = select({
+    additional_srcs  = [":ansi_colors.h"] + select({
         "//config/profile:dev?": [
-            ":ansi_colors.h",
             ":trace_dev.h"
         ],
         "//conditions:default": [

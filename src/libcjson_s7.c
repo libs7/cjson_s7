@@ -10,6 +10,7 @@
 #include "libcjson_s7.h"
 
 #if defined(DEVBUILD)
+#define CJSON_TYPE_NAME(x) (char*)#x
 char *cjson_types[256] = {
     [cJSON_Invalid] = CJSON_TYPE_NAME(cJSON_Invalid), // (0)
     [cJSON_False]   = CJSON_TYPE_NAME(cJSON_False),   // (1 << 0)

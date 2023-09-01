@@ -1,37 +1,24 @@
-load("//config/cc:BUILD.bzl",
-     "BASE_SRCS", "BASE_DEPS", "BASE_INCLUDE_PATHS",
-     "BASE_COPTS", "BASE_DEFINES", "BASE_LINKOPTS")
+load("@libs7//plugin:MACROS.bzl", "s7_plugin_test")
 
-SRCS          = BASE_SRCS + ["macros.h", "//src:trace_dev.h"]
-DEPS          = BASE_DEPS + [
-    "@s7_tools//src:s7plugin_test_config",
-    "@gopt//src:gopt",
-    "@unity//src:unity",
-    "@uthash//src:uthash",
-]
-INCLUDE_PATHS = BASE_INCLUDE_PATHS + [
-    "-Isrc",
-    "-I$(@gopt)/src",
-    "-I$(@unity)/src",
-    "-I$(@uthash)/src",
-    "-I$(GENDIR)/$(@s7_tools)/src",
-]
-COPTS         = BASE_COPTS + INCLUDE_PATHS + [
-    # macos only?
-    "-Wno-gnu-statement-expression" # TRACE_S7_DUMP macro
-]
-DEFINES       = BASE_DEFINES
-LINKOPTS      = BASE_LINKOPTS
+load("//config/cc:CONFIG.bzl",
+     "BASE_DEFINES", "BASE_LINKOPTS")
+
+SRCS       = ["macros.h", "//src:trace_dev.h"]
+DEPS       = ["//src:cjson_s7"]
+COPTS      = ["-I$(@)/src",
+              "-Wno-gnu-statement-expression"]
+DEFINES    = BASE_DEFINES
+LINKOPTS   = BASE_LINKOPTS
 TOOLCHAINS = ["//:test_repo_paths"]
-TIMEOUT = "short"
-TAGS = ["json"]
+TIMEOUT    = "short"
+TAGS       = ["json"]
 
 ################################################################
 test_suite(
     name  = "test",
     tests = [
         ":array_to_scm_test",
-        # ":array_to_scm_dso_static_test",
+        ":array_to_scm_dso_static_test",
         ":arrays_test",
         ":readers_test",
         ":map_to_scm_test",
@@ -41,12 +28,11 @@ test_suite(
 )
 
 ################################################################
-cc_test(
+s7_plugin_test(
     name          = "array_to_scm_test",
-    linkstatic    = True,
     srcs          = SRCS + ["json_array_to_scm_test.c"],
     local_defines = DEFINES,
-    deps          = DEPS + ["//src:cjson_s7"],
+    deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
@@ -54,9 +40,8 @@ cc_test(
     tags          = TAGS + ["arrays", "conversion"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "array_to_scm_dso_static_test",
-    linkstatic    = True,
     srcs          = SRCS + ["json_array_to_scm_test.c"],
     data          = ["//src:cjson_s7_dso"],
     local_defines = DEFINES,
@@ -68,25 +53,25 @@ cc_test(
     tags          = TAGS + ["arrays", "conversion"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "arrays_test",
-    linkstatic    = True,
+    # linkstatic    = True,
     srcs          = SRCS + ["json_arrays_test.c"],
-    local_defines = DEFINES,
-    deps          = DEPS + ["@cjson_s7//src:cjson_s7"],
+    deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
+    local_defines = DEFINES,
     toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "map_to_scm_test",
     linkstatic    = True,
     srcs          = SRCS + ["json_map_to_scm_test.c"],
     local_defines = DEFINES,
-    deps          = DEPS + ["@cjson_s7//src:cjson_s7"],
+    deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
@@ -94,12 +79,12 @@ cc_test(
     tags          = TAGS + ["maps", "conversion"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "maps_test",
     linkstatic    = True,
     srcs          = SRCS + ["json_maps_test.c"],
     local_defines = DEFINES,
-    deps          = DEPS + ["//src:cjson_s7"],
+    deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
     toolchains    = TOOLCHAINS,
@@ -107,12 +92,12 @@ cc_test(
     tags          = TAGS + ["maps"]
 )
 
-cc_test(
+s7_plugin_test(
     name          = "readers_test",
-    linkstatic    = True,
+    # linkstatic    = True,
     srcs          = SRCS + ["json_readers_test.c"],
     local_defines = DEFINES,
-    deps          = DEPS + ["//src:cjson_s7"],
+    deps          = DEPS,
     data          = ["//test/data:json"],
     copts         = COPTS,
     linkopts      = LINKOPTS,
