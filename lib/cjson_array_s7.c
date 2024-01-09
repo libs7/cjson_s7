@@ -6,7 +6,7 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "log.h"
+#include "liblogc.h"
 
 #if INTERFACE
 #include "cJSON.h"
@@ -14,6 +14,18 @@
 #endif
 
 #include "cjson_array_s7.h"
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  cjson_s7_trace
+#define DEBUG_LEVEL cjson_s7_debug
+extern bool    TRACE_FLAG;
+extern int     DEBUG_LEVEL;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+extern bool s7plugin_trace;
+extern int  s7plugin_debug;
+#endif
 
 int json_array_type_tag = 0;
 
@@ -107,7 +119,7 @@ s7_pointer g_json_array_ref(s7_scheme *s7, s7_pointer args)
     if (s7_is_integer(arg)) {
         // for procedures map, for-each
         idx = s7_integer(arg);
-        TRACE_LOG_DEBUG("arg 1, idx: %d", idx);
+        LOG_DEBUG(0, "arg 1, idx: %d", idx);
     } else {
         return(s7_wrong_type_error(s7, s7_make_string_wrapper_with_length(s7, "json:map-ref", 14), 2, arg, string_string));
     }
@@ -250,7 +262,7 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
         log_error("OOM");
         return NULL;
     } else {
-        TRACE_LOG_DEBUG("callocated %d chars for buffer", BUFSZ);
+        LOG_DEBUG(0, "callocated %d chars for buffer", BUFSZ);
     }
     size_t bufsz = BUFSZ;
     size_t char_ct = 0;
@@ -259,17 +271,17 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
 
     // print header
     errno = 0;
-    TRACE_LOG_DEBUG("snprintfing header", "");
+    LOG_DEBUG(0, "snprintfing header", "");
     ct = snprintf(buf, 2, "%s", "[");
     if (errno) {
         log_error("snprintf: %s", strerror(errno));
         return NULL;
     } else {
-        TRACE_LOG_DEBUG("snprintf hdr ct: %d", ct);
+        LOG_DEBUG(0, "snprintf hdr ct: %d", ct);
     }
     char_ct += 1; // do not include terminating '\0'
-    TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-    TRACE_LOG_DEBUG("buf: %s", buf);
+    LOG_DEBUG(0, "buf len: %d", strlen(buf));
+    LOG_DEBUG(0, "buf: %s", buf);
 
 #ifdef DEVBUILD
     // NB: root object has no name, jo->string == NULL
@@ -277,7 +289,7 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
                     ja->string, ja->type, cjson_types[ja->type]);
 #endif
     int key_ct = cJSON_GetArraySize(ja);
-    TRACE_LOG_DEBUG("array size: %d", key_ct);
+    LOG_DEBUG(0, "array size: %d", key_ct);
 
     // print fields
     cJSON *k; //, *v;
@@ -303,23 +315,23 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
                 log_error("realloc for comma");
             } else {
                 errno = 0;
-                TRACE_LOG_DEBUG("snprintfing comma", "");
+                LOG_DEBUG(0, "snprintfing comma", "");
                 ct = snprintf(buf+char_ct, 3, "%s", ", ");
                 if (errno) {
                     log_error("snprintf: %s", strerror(errno));
                     break;
                 } else {
-                    TRACE_LOG_DEBUG("snprintf comma ct: %d", ct);
+                    LOG_DEBUG(0, "snprintf comma ct: %d", ct);
                 }
                 char_ct += 2; // do not include terminating '\0'
-                TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-                TRACE_LOG_DEBUG("buf: %s", buf);
+                LOG_DEBUG(0, "buf len: %d", strlen(buf));
+                LOG_DEBUG(0, "buf: %s", buf);
             }
         }
 
         /* // print key to buf */
         /* errno = 0; */
-        /* TRACE_LOG_DEBUG("snprintfing key len %d", len); */
+        /* LOG_DEBUG(0, "snprintfing key len %d", len); */
         /* len = strlen(k->string) + 3; // for " = " */
         /* len++; // terminating '\0' */
         /* if ((char_ct + len) > bufsz) { // + 1 for '\0' */
@@ -331,18 +343,18 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
         /*     log_error("snprintf: %s", strerror(errno)); */
         /*     break; */
         /* } else { */
-        /*     TRACE_LOG_DEBUG("snprintf ct: %d", ct); */
+        /*     LOG_DEBUG(0, "snprintf ct: %d", ct); */
         /* } */
         /* char_ct += len - 1; // do not include terminating '\0' */
-        /* TRACE_LOG_DEBUG("buf len: %d", strlen(buf)); */
-        /* TRACE_LOG_DEBUG("buf: %s", buf); */
+        /* LOG_DEBUG(0, "buf len: %d", strlen(buf)); */
+        /* LOG_DEBUG(0, "buf: %s", buf); */
 
         // print value
         char *seq_str;
 
         switch(k->type) {
         case cJSON_String:
-            TRACE_LOG_DEBUG("key type: String: %s", k->valuestring);
+            LOG_DEBUG(0, "key type: String: %s", k->valuestring);
             char *value = k->valuestring;
             len = strlen(value) + 2; // for quotes
             len++; // terminating '\0'
@@ -355,14 +367,14 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
                 log_error("snprintf: %s", strerror(errno));
                 break;
             } else {
-                TRACE_LOG_DEBUG("snprintf ct: %d", ct);
+                LOG_DEBUG(0, "snprintf ct: %d", ct);
             }
             char_ct += len - 1; // do not include terminating '\0'
-            TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-            TRACE_LOG_DEBUG("buf: %s", buf);
+            LOG_DEBUG(0, "buf len: %d", strlen(buf));
+            LOG_DEBUG(0, "buf: %s", buf);
             break;
         case cJSON_Array:
-            TRACE_LOG_DEBUG("key type: Array: %s", k->string);
+            LOG_DEBUG(0, "key type: Array: %s", k->string);
             seq_str = json_array_to_string(s7, k);
             len = strlen(seq_str);
             len++; // terminating '\0'
@@ -375,14 +387,14 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
                 log_error("snprintf: %s", strerror(errno));
                 break;
             } else {
-                TRACE_LOG_DEBUG("snprintf ct: %d", ct);
+                LOG_DEBUG(0, "snprintf ct: %d", ct);
             }
             char_ct += len - 1; // do not include terminating '\0'
-            TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-            TRACE_LOG_DEBUG("buf: %s", buf);
+            LOG_DEBUG(0, "buf len: %d", strlen(buf));
+            LOG_DEBUG(0, "buf: %s", buf);
             break;
         case cJSON_Object:
-            TRACE_LOG_DEBUG("key type: Object: %s", k->string);
+            LOG_DEBUG(0, "key type: Object: %s", k->string);
             seq_str = json_object_to_string(s7, k);
             len = strlen(seq_str);
             len++; // terminating '\0'
@@ -395,14 +407,14 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
                 log_error("snprintf: %s", strerror(errno));
                 break;
             } else {
-                TRACE_LOG_DEBUG("snprintf ct: %d", ct);
+                LOG_DEBUG(0, "snprintf ct: %d", ct);
             }
             char_ct += len - 1; // do not include terminating '\0'
-            TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-            TRACE_LOG_DEBUG("buf: %s", buf);
+            LOG_DEBUG(0, "buf len: %d", strlen(buf));
+            LOG_DEBUG(0, "buf: %s", buf);
             break;
         case cJSON_Number:
-            TRACE_LOG_DEBUG("key number value: %g", k->valuedouble);
+            LOG_DEBUG(0, "key number value: %g", k->valuedouble);
             len = snprintf(NULL, 0, "%g", k->valuedouble);
             len++; // terminating '\0'
             if ((char_ct + len) > bufsz) { // + 1 for '\0'
@@ -414,23 +426,23 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
                 log_error("snprintf: %s", strerror(errno));
                 break;
             } else {
-                TRACE_LOG_DEBUG("snprintf ct: %d", ct);
+                LOG_DEBUG(0, "snprintf ct: %d", ct);
             }
             char_ct += len - 1; // do not include terminating '\0'
-            TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-            TRACE_LOG_DEBUG("buf: %s", buf);
+            LOG_DEBUG(0, "buf len: %d", strlen(buf));
+            LOG_DEBUG(0, "buf: %s", buf);
             break;
         case cJSON_False:
-            TRACE_LOG_DEBUG("key type %s", "False");
+            LOG_DEBUG(0, "key type %s", "False");
             break;
         case cJSON_True:
-            TRACE_LOG_DEBUG("key type: %s", "True");
+            LOG_DEBUG(0, "key type: %s", "True");
             break;
         case cJSON_NULL:
-            TRACE_LOG_DEBUG("key type: %s", "NULL");
+            LOG_DEBUG(0, "key type: %s", "NULL");
             break;
         case cJSON_Raw:
-            TRACE_LOG_DEBUG("key type: %s", "Raw");
+            LOG_DEBUG(0, "key type: %s", "Raw");
             break;
         default:
             log_error("Bad key type");
@@ -441,19 +453,19 @@ char *json_array_to_string(s7_scheme *s7, const cJSON *ja)
     // print footer
     {
         errno = 0;
-        TRACE_LOG_DEBUG("snprintfing footer", "");
+        LOG_DEBUG(0, "snprintfing footer", "");
         ct = snprintf(buf+char_ct, 2, "%s", "]");
         if (errno) {
             log_error("snprintf: %s", strerror(errno));
             return NULL;
         } else {
-            TRACE_LOG_DEBUG("snprintf hdr ct: %d", ct);
+            LOG_DEBUG(0, "snprintf hdr ct: %d", ct);
         }
         char_ct += 1; // do not include terminating '\0'
-        TRACE_LOG_DEBUG("buf len: %d", strlen(buf));
-        TRACE_LOG_DEBUG("buf: %s", buf);
+        LOG_DEBUG(0, "buf len: %d", strlen(buf));
+        LOG_DEBUG(0, "buf: %s", buf);
     }
-    TRACE_LOG_DEBUG("json_array_to_string returning: %s", buf);
+    LOG_DEBUG(0, "json_array_to_string returning: %s", buf);
     return buf;
 }
 
@@ -493,7 +505,7 @@ void json_array_init(s7_scheme *s7, s7_pointer cur_env)
 {
     TRACE_ENTRY;
     json_array_type_tag = s7_make_c_type(s7, "json_array");
-    /* TRACE_LOG_DEBUG("JSON_ARRAY_TAG: %d", json_array_type_tag); */
+    /* LOG_DEBUG(0, "JSON_ARRAY_TAG: %d", json_array_type_tag); */
 
     s7_c_type_set_gc_free      (s7, json_array_type_tag, free_json_array);
     s7_c_type_set_gc_mark      (s7, json_array_type_tag, mark_json_array);

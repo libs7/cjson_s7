@@ -1,15 +1,19 @@
+load("@makeheaders//rules:makeheaders.bzl", "makeheaders")
 load("@libs7//plugin:MACROS.bzl", "s7_plugin_test")
-
 load("//config/cc:CONFIG.bzl",
-     "BASE_DEFINES", "BASE_LINKOPTS")
+     "BASE_COPTS",
+     "BASE_LINKOPTS",
+     "PROFILE")
 
-SRCS       = ["macros.h", "//src:trace_dev.h"]
-DEPS       = ["//src:cjson_s7"]
-COPTS      = ["-I$(@)/src",
-              "-Wno-gnu-statement-expression"]
-DEFINES    = BASE_DEFINES
+SRCS       = ["macros.h", ":mkhdrs"]
+DEPS       = ["//lib:cjson_s7"]
+COPTS      = BASE_COPTS + [
+    # "-I$(@)/src",
+    "-Wno-gnu-statement-expression",
+    "-I$(GENDIR)/test"
+]
+DEFINES    = PROFILE
 LINKOPTS   = BASE_LINKOPTS
-TOOLCHAINS = ["//:test_repo_paths"]
 TIMEOUT    = "short"
 TAGS       = ["json"]
 
@@ -31,11 +35,10 @@ test_suite(
 s7_plugin_test(
     name          = "array_to_scm_test",
     srcs          = SRCS + ["json_array_to_scm_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
+    defines       = DEFINES,
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays", "conversion"]
 )
@@ -43,12 +46,11 @@ s7_plugin_test(
 s7_plugin_test(
     name          = "array_to_scm_dso_static_test",
     srcs          = SRCS + ["json_array_to_scm_test.c"],
-    data          = ["//src:cjson_s7_dso"],
-    local_defines = DEFINES,
+    data          = ["//lib:cjson_s7_dso"],
+    defines       = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays", "conversion"]
 )
@@ -60,8 +62,7 @@ s7_plugin_test(
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
+    defines       = DEFINES,
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays"]
 )
@@ -70,11 +71,10 @@ s7_plugin_test(
     name          = "map_to_scm_test",
     linkstatic    = True,
     srcs          = SRCS + ["json_map_to_scm_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
+    defines       = DEFINES,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps", "conversion"]
 )
@@ -83,11 +83,10 @@ s7_plugin_test(
     name          = "maps_test",
     linkstatic    = True,
     srcs          = SRCS + ["json_maps_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
+    defines       = DEFINES,
     timeout       = TIMEOUT,
     tags          = TAGS + ["maps"]
 )
@@ -96,22 +95,21 @@ s7_plugin_test(
     name          = "readers_test",
     # linkstatic    = True,
     srcs          = SRCS + ["json_readers_test.c"],
-    local_defines = DEFINES,
     deps          = DEPS,
     data          = ["//test/data:json"],
     copts         = COPTS,
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
+    defines       = DEFINES,
     timeout       = TIMEOUT,
     tags          = TAGS + ["readers"]
 )
 
-# cc_test(
+# s7_plugin_test(
 #     name = "work",
 #     linkstatic = True,
 #     srcs = ["json_work_test.c",
 #             "//test/unit:common.c", "//test/unit:common.h",
-#             "//src:libs7.h"],
+#             "//lib:libs7.h"],
 #     local_defines = DEFINES,
 #     deps = DEPS + [
 #         "//dev",
@@ -135,12 +133,12 @@ s7_plugin_test(
 # #     linkstatic = True,
 # #     srcs = ["json_strings_test.c",
 # #             "//test/unit:common.c", "//test/unit:common.h",
-# #             "//src:libs7.h"],
+# #             "//lib:libs7.h"],
 # #     local_defines = DEFINES,
 # #     data = ["//test/unit/libjson/data:strings.json"],
 # #     deps = DEPS + [
 # #         "//dev",
-# #         "//src:s7",
+# #         "//lib:s7",
 # #         "//lib/libjson:json_s7"
 # #     ],
 # #     copts = COPTS + [
@@ -154,4 +152,28 @@ s7_plugin_test(
 # #     linkopts = LINKOPTS,
 # #     timeout = TIMEOUT
 # # )
+
+makeheaders(
+    name = "mkhdrs",
+    hdrs_srcs = [
+        "json_array_to_scm_test.c",
+        "json_arrays_test.c",
+        "json_map_to_scm_test.c",
+        "json_maps_test.c",
+        "json_readers_test.c",
+        "json_work_test.c"
+    ],
+    additional_srcs = [
+        "@makeheaders//logging:ansi_colors.h"
+    ] + select({
+        "@makeheaders//compilation_mode:fastbuild": [
+            "@libs7//logging:s7_macros_debug.h",
+            "@makeheaders//logging:macros_debug.h"
+        ],
+        "//conditions:default": [
+            "@libs7//logging:s7_macros_ndebug.h",
+            "@makeheaders//logging:macros_ndebug.h"
+        ]
+    }),
+)
 

@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,20 @@
 
 #include "macros.h"
 #include "s7plugin_test_config.h"
+
+#include "json_map_to_scm_test.h"
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  cjson_s7_trace
+#define DEBUG_LEVEL cjson_s7_debug
+extern bool    TRACE_FLAG;
+extern int     DEBUG_LEVEL;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+extern bool s7plugin_trace;
+extern int  s7plugin_debug;
+#endif
 
 s7_scheme *s7;
 
@@ -37,7 +51,7 @@ void map_to_ht_ints(void)
     tt = JSON_READ("{\"fld1\": 1, \"fld2\": 2}");
     ht = APPLY_1("json:map->hash-table", tt);
     flag = APPLY_1("hash-table?", ht);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
     TEST_ASSERT_FALSE(s7_boolean(s7, flag));
@@ -57,7 +71,7 @@ void map_to_ht_reals(void)
     tt = JSON_READ("{\"fld1\": 1.1, \"fld2\": 2.2}");
     ht = APPLY_1("json:map->hash-table", tt);
     flag = APPLY_1("hash-table?", ht);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
     TEST_ASSERT_FALSE(s7_boolean(s7, flag));
@@ -77,7 +91,7 @@ void map_to_ht_bools(void)
     tt = JSON_READ("{\"fld1\": true, \"fld2\": false}");
     ht = APPLY_1("json:map->hash-table", tt);
     flag = APPLY_1("hash-table?", ht);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
     TEST_ASSERT_FALSE(s7_boolean(s7, flag));
@@ -101,7 +115,7 @@ void map_to_ht_nulls(void)
     tt = JSON_READ("{\"fld1\": true, \"fld2\": null}");
     ht = APPLY_1("json:map->hash-table", tt);
     flag = APPLY_1("hash-table?", ht);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
     TEST_ASSERT_FALSE(s7_boolean(s7, flag));
@@ -125,7 +139,7 @@ void map_to_ht_strings(void)
     tt = JSON_READ("{\"fld1\": \"hello\", \"fld2\": \"world\"}");
     ht = APPLY_1("json:map->hash-table", tt);
     flag = APPLY_1("hash-table?", ht);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
     TEST_ASSERT_FALSE(s7_boolean(s7, flag));
@@ -144,7 +158,7 @@ void nested_table_to_hash_table(void)
 {
     tt = JSON_READ("{\"a\": {\"b\": 0}}");
     ht = APPLY_1("json:map->hash-table", tt);
-    TRACE_S7_DUMP("ht", ht);
+    TRACE_S7_DUMP(0, "ht: %s", ht);
     flag = APPLY_1("hash-table?", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
@@ -152,7 +166,7 @@ void nested_table_to_hash_table(void)
 
     sexp_str = "(hash-table :a (hash-table :b 0))";
     expected = EVAL(sexp_str);
-    TRACE_S7_DUMP("expected", expected);
+    TRACE_S7_DUMP(0, "expected: %s", expected);
     flag = APPLY_1("hash-table?", expected);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
@@ -161,13 +175,13 @@ void nested_table_to_hash_table(void)
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
     res = APPLY_1("object->string", ht);
-    TRACE_S7_DUMP("res", res);
+    TRACE_S7_DUMP(0, "res: %s", res);
     TEST_ASSERT_EQUAL_STRING(sexp_str, s7_string(res));
 
     /* // verify value at "a" of toml-table (not ht) is a toml-table */
     k = s7_make_string(s7, "a");
     subt = APPLY_2("json:map-ref", tt, k);
-    TRACE_S7_DUMP("subt", subt);
+    TRACE_S7_DUMP(0, "subt: %s", subt);
     flag = APPLY_1("json:map?", subt);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
 
@@ -187,9 +201,9 @@ void nested_table_to_hash_table(void)
 
 int main(int argc, char **argv)
 {
-    s7 = initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("interpolation", argc, argv);
 
-    libs7_load_clib(s7, "cjson");
+    libs7_load_plugin(s7, "cjson");
 
     UNITY_BEGIN();
 

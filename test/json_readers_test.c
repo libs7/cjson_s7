@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,20 @@
 
 #include "macros.h"
 #include "s7plugin_test_config.h"
+
+#include "json_readers_test.h"
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  cjson_s7_trace
+#define DEBUG_LEVEL cjson_s7_debug
+extern bool    TRACE_FLAG;
+extern int     DEBUG_LEVEL;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+extern bool s7plugin_trace;
+extern int  s7plugin_debug;
+#endif
 
 s7_scheme *s7;
 
@@ -73,7 +87,7 @@ void with_input_from_string(void) {
                                      s7_cons(s7, json_read,
                                              s7_nil(s7)))),
                              s7_rootlet(s7));
-    /* TRACE_S7_DUMP("with-input-from-string", actual); */
+    /* TRACE_S7_DUMP(0, "with-input-from-string: %s", actual); */
     res = APPLY_1("json:map?", actual);
     TEST_ASSERT_EQUAL(res, s7_t(s7));
 }
@@ -138,7 +152,7 @@ void read_file_port(void) {
 /*     cmd = "" */
 /*     "(call-with-input-file \"test/libtoml/data/strings.toml\" json:read)"; */
 /*     t = s7_eval_c_string(s7, cmd); */
-/*     TRACE_S7_DUMP("t", t); */
+/*     TRACE_S7_DUMP(0, "t: %s", t); */
 /*     /\* s7_pointer is_input_port = s7_is_input_port(s7, inport); *\/ */
 /*     /\* TEST_ASSERT_EQUAL(true, is_input_port); *\/ */
 /*     /\* t = JSON_READ(inport); *\/ */
@@ -172,9 +186,9 @@ void read_file_port(void) {
 
 int main(int argc, char **argv)
 {
-    s7 = initialize("interpolation", argc, argv);
+    s7 = s7_plugin_initialize("interpolation", argc, argv);
 
-    libs7_load_clib(s7, "cjson");
+    libs7_load_plugin(s7, "cjson");
 
     json_read = s7_name_to_value(s7, "json:read");
 

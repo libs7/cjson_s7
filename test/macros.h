@@ -1,7 +1,7 @@
 #ifndef _MACROS_H
 #define _MACROS_H
 
-#include "trace_dev.h"
+/* #include "trace_dev.h" */
 
 #include "gopt.h"
 #include "libs7.h"

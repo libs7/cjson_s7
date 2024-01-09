@@ -1,21 +1,20 @@
-load("@makeheaders//src:RULES.bzl", "makeheaders")
+load("@makeheaders//rules:makeheaders.bzl", "makeheaders")
 load("@libs7//plugin:MACROS.bzl", "s7_plugin", "s7_library")
 
 load("//config/cc:CONFIG.bzl",
      "BASE_SRCS", "BASE_DEPS",
      "BASE_COPTS", "BASE_INCLUDE_PATHS",
-     "BASE_DEFINES", "BASE_LINKOPTS")
+     "BASE_DEFINES", "BASE_LINKOPTS",
+     "PROFILE")
 
 SRCS = BASE_SRCS
 DEPS = BASE_DEPS + ["@cjson//:cjson"]
-INCLUDE_PATHS = BASE_INCLUDE_PATHS + ["-I$(@cjson)/include"]
+INCLUDE_PATHS = BASE_INCLUDE_PATHS #  + ["-I$(@cjson)/include"]
 COPTS         = BASE_COPTS + INCLUDE_PATHS
 DEFINES       = BASE_DEFINES
 LINKOPTS      = BASE_LINKOPTS
 
-TOOLCHAINS = ["//:repo_paths"]
-
-exports_files(["trace_dev.h"]) # for testing
+LOCAL_REPO = repository_name()[1:]
 
 ################################################################
 s7_plugin(
@@ -23,10 +22,13 @@ s7_plugin(
     srcs          = SRCS + ["libcjson_s7.c", ":mkhdrs"],
     hdrs          = ["cjson_s7.h"],
     deps          = DEPS + [":cjson_map", ":cjson_array"],
-    copts         = COPTS + ["-I$(GENDIR)/$(@)/src"],
+    copts         = COPTS + [
+        "-I$(GENDIR)/{}/lib".format(LOCAL_REPO),
+        "-I$(GENDIR)/external/{}/lib".format(LOCAL_REPO)
+    ],
     linkopts      = LINKOPTS,
+    defines       = PROFILE,
     local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
     visibility    = ["//visibility:public"]
 )
 
@@ -48,10 +50,12 @@ s7_library(
     linkstatic    = True,
     srcs          = SRCS + ["cjson_array_s7.c", ":mkhdrs"],
     deps          = DEPS,
-    copts         = COPTS + ["-I$(GENDIR)/$(@)/src"],
+    copts         = COPTS + [
+        "-I$(GENDIR)/{}/lib".format(LOCAL_REPO),
+        "-I$(GENDIR)/external/{}/lib".format(LOCAL_REPO)
+    ],
     linkopts      = LINKOPTS,
     local_defines = DEFINES,
-    toolchains    = TOOLCHAINS,
 )
 
 s7_library(
@@ -59,9 +63,11 @@ s7_library(
     linkstatic    = True,
     srcs          = SRCS + ["cjson_map_s7.c", ":mkhdrs"],
     deps          = DEPS,
-    copts         = COPTS + ["-I$(GENDIR)/$(@)/src"],
+    copts         = COPTS + [
+        "-I$(GENDIR)/{}/lib".format(LOCAL_REPO),
+        "-I$(GENDIR)/external/{}/lib".format(LOCAL_REPO)
+    ],
     linkopts      = LINKOPTS,
-    toolchains    = TOOLCHAINS,
     local_defines = DEFINES
 )
 
@@ -73,14 +79,18 @@ makeheaders(
         "cjson_array_s7.c",
         "cjson_map_s7.c"
     ],
-    additional_srcs  = [":ansi_colors.h"] + select({
-        "//config/profile:dev?": [
-            ":trace_dev.h"
+    additional_srcs = [
+        "@makeheaders//logging:ansi_colors.h"
+    ] + select({
+        "@makeheaders//compilation_mode:fastbuild": [
+            "@libs7//logging:s7_macros_debug.h",
+            "@makeheaders//logging:macros_debug.h"
         ],
         "//conditions:default": [
-            ":trace_prod.h"
+            "@libs7//logging:s7_macros_ndebug.h",
+            "@makeheaders//logging:macros_ndebug.h"
         ]
-    })
+    }),
 )
 
 makeheaders(
@@ -92,13 +102,16 @@ makeheaders(
         "cjson_array_s7.c",
         "cjson_map_s7.c"
     ],
-    additional_srcs  = select({
-        "//config/profile:dev?": [
-            ":ansi_colors.h",
-            ":trace_dev.h"
+    additional_srcs = [
+        "@makeheaders//logging:ansi_colors.h"
+    ] + select({
+        "@makeheaders//compilation_mode:fastbuild": [
+            "@libs7//logging:s7_macros_debug.h",
+            "@makeheaders//logging:macros_debug.h"
         ],
         "//conditions:default": [
-            ":trace_prod.h"
+            "@libs7//logging:s7_macros_ndebug.h",
+            "@makeheaders//logging:macros_ndebug.h"
         ]
-    })
+    }),
 )

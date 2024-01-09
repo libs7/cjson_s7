@@ -5,11 +5,23 @@
 #include <string.h>
 #include <sys/stat.h>
 
-#include "log.h"
+#include "liblogc.h"
 
 #include "libcjson_s7.h"
 
-#if defined(DEVBUILD)
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  cjson_s7_trace
+#define DEBUG_LEVEL cjson_s7_debug
+bool    TRACE_FLAG = 0;
+int     DEBUG_LEVEL = 0;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+extern bool s7plugin_trace;
+extern int  s7plugin_debug;
+#endif
+
+#if defined(PROFILE_fastbuild)
 #define CJSON_TYPE_NAME(x) (char*)#x
 char *cjson_types[256] = {
     [cJSON_Invalid] = CJSON_TYPE_NAME(cJSON_Invalid), // (0)
@@ -67,7 +79,7 @@ static s7_pointer json_is_datum(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
 {
     TRACE_ENTRY;
-    /* TRACE_S7_DUMP("args", args); */
+    /* TRACE_S7_DUMP(0, "args: %s", args); */
     s7_pointer p, arg;
     const char* json_str;
 
@@ -110,7 +122,7 @@ static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
         /* s7_pointer dt = s7_type_of(s7, arg); */
         /* trace_S7_DUMP("argtyp", dt); */
         if (s7_is_input_port(s7, arg)) {
-            TRACE_LOG_DEBUG("read arg is input port", "");
+            LOG_DEBUG(0, "read arg is input port", "");
 
             /* json_str = libs7_input_port_to_c_string(s7, arg); */
             s7_pointer len = s7_call(s7, s7_length,
@@ -128,7 +140,7 @@ static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
         }
     }
 
-    TRACE_LOG_DEBUG("parsing: %s", json_str);
+    LOG_DEBUG(0, "parsing: %s", json_str);
     cJSON *jo = cJSON_Parse(json_str);
     if (jo == NULL) {
         log_error("cJSON_Parse error");
@@ -173,7 +185,7 @@ s7_pointer json_read_file(s7_scheme *s7, char *fname)
         log_debug("json returning obj");
         s7_pointer dt = s7_type_of(s7, rval);
         (void)dt;
-        TRACE_S7_DUMP("typ", dt);
+        TRACE_S7_DUMP(0, "typ: %s", dt);
         log_debug("json-map? %d",
                   s7_c_object_type(rval) == json_object_type_tag);
         log_debug("obj tag: %d", json_object_type_tag);

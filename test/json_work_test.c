@@ -1,5 +1,5 @@
 #include "gopt.h"
-#include "log.h"
+#include "liblogc.h"
 #include "unity.h"
 #include "utarray.h"
 #include "utstring.h"
@@ -8,6 +8,20 @@
 
 #include "macros.h"
 #include "s7plugin_test_config.h"
+
+#include "json_work_test.h"
+
+#if defined(PROFILE_fastbuild)
+#define TRACE_FLAG  cjson_s7_trace
+#define DEBUG_LEVEL cjson_s7_debug
+extern bool    TRACE_FLAG;
+extern int     DEBUG_LEVEL;
+
+#define S7_DEBUG_LEVEL libs7_debug
+extern int  libs7_debug;
+extern bool s7plugin_trace;
+extern int  s7plugin_debug;
+#endif
 
 s7_scheme *s7;
 
@@ -59,9 +73,9 @@ void work(void) {
 
 int main(int argc, char **argv)
 {
-    s7 = initialize("work", argc, argv);
+    s7 = s7_plugin_initialize("work", argc, argv);
 
-    libs7_load_clib(s7, "cjson");
+    libs7_load_plugin(s7, "cjson");
 
     UNITY_BEGIN();
 
