@@ -79,7 +79,7 @@ static s7_pointer json_is_datum(s7_scheme *s7, s7_pointer args)
 static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
 {
     TRACE_ENTRY;
-    /* TRACE_S7_DUMP(0, "args: %s", args); */
+    /* LOG_S7_DEBUG(0, "args:", args); */
     s7_pointer p, arg;
     const char* json_str;
 
@@ -161,7 +161,7 @@ static s7_pointer g_json_read(s7_scheme *s7, s7_pointer args)
 
 
 /* -------- json_read_file -------- */
-s7_pointer json_read_file(s7_scheme *s7, char *fname)
+EXPORT s7_pointer json_read_file(s7_scheme *s7, char *fname)
 {
     TRACE_ENTRY;
     log_debug("json file: %s", fname);
@@ -185,7 +185,7 @@ s7_pointer json_read_file(s7_scheme *s7, char *fname)
         log_debug("json returning obj");
         s7_pointer dt = s7_type_of(s7, rval);
         (void)dt;
-        TRACE_S7_DUMP(0, "typ: %s", dt);
+        LOG_S7_DEBUG(0, "typ:", dt);
         log_debug("json-map? %d",
                   s7_c_object_type(rval) == json_object_type_tag);
         log_debug("obj tag: %d", json_object_type_tag);

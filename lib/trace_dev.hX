@@ -14,6 +14,6 @@
     }
 #define TRACE_LOG_DEBUG(fmt, msg) log_debug(fmt, msg)
 
-#define TRACE_S7_DUMP(msg, x) (({char*s=s7_object_to_c_string(s7, x);log_debug("%s: '%s'", msg, s);fflush(NULL);free(s);}))
-#define TRACE_S7_DUMP60(msg, x) (({char*s=s7_object_to_c_string(s7, x);log_debug("%s: '%.60s' (first 60 chars)", msg, s);fflush(NULL);free(s);}))
+#define LOG_S7_DEBUG(msg, x) (({char*s=s7_object_to_c_string(s7, x);log_debug("%s: '%s'", msg, s);fflush(NULL);free(s);}))
+#define LOG_S7_DEBUG60(msg, x) (({char*s=s7_object_to_c_string(s7, x);log_debug("%s: '%.60s' (first 60 chars)", msg, s);fflush(NULL);free(s);}))
 

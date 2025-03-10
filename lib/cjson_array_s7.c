@@ -92,7 +92,7 @@ static s7_pointer json_array_is_equivalent(s7_scheme *s7, s7_pointer args)
 /*
  * Called for json:array-ref
  * Called when a array is applied to an index
- * Called with int args when map or for-each are applied to a array
+ * Called with int args when map or for-each are applied to an array
  */
 s7_pointer g_json_array_ref(s7_scheme *s7, s7_pointer args)
 {
@@ -114,7 +114,7 @@ s7_pointer g_json_array_ref(s7_scheme *s7, s7_pointer args)
     }
 
     p = s7_cdr(p);
-    arg = s7_car(p);            /* arg 1: string key */
+    arg = s7_car(p);            /* arg 1: int key */
     int idx;
     if (s7_is_integer(arg)) {
         // for procedures map, for-each

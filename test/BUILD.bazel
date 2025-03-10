@@ -4,13 +4,13 @@ load("//config/cc:CONFIG.bzl",
      "BASE_COPTS",
      "BASE_LINKOPTS",
      "PROFILE")
+load("@unity//src:BUILD.bzl", "unity_library")
 
 SRCS       = ["macros.h", ":mkhdrs"]
-DEPS       = ["//lib:cjson_s7"]
-COPTS      = BASE_COPTS + [
-    # "-I$(@)/src",
-    "-Wno-gnu-statement-expression",
-    "-I$(GENDIR)/test"
+DEPS       = ["//lib:cjson_s7"] # , ":libunity"]
+COPTS      = [ # BASE_COPTS + [
+    "-I$(GENDIR)/test",
+    # "-Wno-gnu-statement-expression",
 ]
 DEFINES    = PROFILE
 LINKOPTS   = BASE_LINKOPTS
@@ -55,14 +55,22 @@ s7_plugin_test(
     tags          = TAGS + ["arrays", "conversion"]
 )
 
+unity_library(
+    name = "libunity",
+    config = "//test/json_arrays_test:unity_config.h")
+
 s7_plugin_test(
     name          = "arrays_test",
-    # linkstatic    = True,
-    srcs          = SRCS + ["json_arrays_test.c"],
+    libunity      = ":libunity",
+    srcs          = SRCS + [
+        "json_arrays_test.c",
+        "//test/json_arrays_test:unity_config.h"
+    ],
     deps          = DEPS,
-    copts         = COPTS,
+    copts         = COPTS + ["-Itest/json_arrays_test"],
     linkopts      = LINKOPTS,
     defines       = DEFINES,
+    local_defines = ["UNITY_INCLUDE_CONFIG_H"],
     timeout       = TIMEOUT,
     tags          = TAGS + ["arrays"]
 )
@@ -164,15 +172,15 @@ makeheaders(
         "json_work_test.c"
     ],
     additional_srcs = [
-        "@makeheaders//logging:ansi_colors.h"
+        "@liblogc//macros:ansi_colors.h"
     ] + select({
-        "@makeheaders//compilation_mode:fastbuild": [
-            "@libs7//logging:s7_macros_debug.h",
-            "@makeheaders//logging:macros_debug.h"
+        "@obazl_tools_cc//profile:dev?": [
+            "@libs7//macros:s7_logging_debug.h",
+            "@liblogc//macros:logging_debug.h"
         ],
         "//conditions:default": [
-            "@libs7//logging:s7_macros_ndebug.h",
-            "@makeheaders//logging:macros_ndebug.h"
+            "@libs7//macros:s7_logging_ndebug.h",
+            "@liblogc//macros:logging_ndebug.h"
         ]
     }),
 )

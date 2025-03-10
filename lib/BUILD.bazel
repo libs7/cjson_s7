@@ -1,3 +1,5 @@
+load("@rules_cc//cc:defs.bzl", "cc_shared_library")
+
 load("@makeheaders//rules:makeheaders.bzl", "makeheaders")
 load("@libs7//plugin:MACROS.bzl", "s7_plugin", "s7_library")
 
@@ -21,6 +23,7 @@ s7_plugin(
     name          = "cjson_s7",
     srcs          = SRCS + ["libcjson_s7.c", ":mkhdrs"],
     hdrs          = ["cjson_s7.h"],
+    includes      = ["."],
     deps          = DEPS + [":cjson_map", ":cjson_array"],
     copts         = COPTS + [
         "-I$(GENDIR)/{}/lib".format(LOCAL_REPO),
@@ -80,15 +83,15 @@ makeheaders(
         "cjson_map_s7.c"
     ],
     additional_srcs = [
-        "@makeheaders//logging:ansi_colors.h"
+        "@liblogc//macros:ansi_colors.h"
     ] + select({
-        "@makeheaders//compilation_mode:fastbuild": [
-            "@libs7//logging:s7_macros_debug.h",
-            "@makeheaders//logging:macros_debug.h"
+        "@obazl_tools_cc//profile:dev?": [
+            "@libs7//macros:s7_logging_debug.h",
+            "@liblogc//macros:logging_debug.h"
         ],
         "//conditions:default": [
-            "@libs7//logging:s7_macros_ndebug.h",
-            "@makeheaders//logging:macros_ndebug.h"
+            "@libs7//macros:s7_logging_ndebug.h",
+            "@liblogc//macros:logging_ndebug.h"
         ]
     }),
 )
@@ -103,15 +106,15 @@ makeheaders(
         "cjson_map_s7.c"
     ],
     additional_srcs = [
-        "@makeheaders//logging:ansi_colors.h"
+        "@liblogc//macros:ansi_colors.h"
     ] + select({
-        "@makeheaders//compilation_mode:fastbuild": [
-            "@libs7//logging:s7_macros_debug.h",
-            "@makeheaders//logging:macros_debug.h"
+        "@obazl_tools_cc//profile:dev?": [
+            "@libs7//macros:s7_logging_debug.h",
+            "@liblogc//macros:logging_debug.h"
         ],
         "//conditions:default": [
-            "@libs7//logging:s7_macros_ndebug.h",
-            "@makeheaders//logging:macros_ndebug.h"
+            "@libs7//macros:s7_logging_ndebug.h",
+            "@liblogc//macros:logging_ndebug.h"
         ]
     }),
 )

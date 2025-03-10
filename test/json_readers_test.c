@@ -87,7 +87,7 @@ void with_input_from_string(void) {
                                      s7_cons(s7, json_read,
                                              s7_nil(s7)))),
                              s7_rootlet(s7));
-    /* TRACE_S7_DUMP(0, "with-input-from-string: %s", actual); */
+    /* LOG_S7_DEBUG(0, "with-input-from-string:", actual); */
     res = APPLY_1("json:map?", actual);
     TEST_ASSERT_EQUAL(res, s7_t(s7));
 }
@@ -152,7 +152,7 @@ void read_file_port(void) {
 /*     cmd = "" */
 /*     "(call-with-input-file \"test/libtoml/data/strings.toml\" json:read)"; */
 /*     t = s7_eval_c_string(s7, cmd); */
-/*     TRACE_S7_DUMP(0, "t: %s", t); */
+/*     LOG_S7_DEBUG(0, "t:", t); */
 /*     /\* s7_pointer is_input_port = s7_is_input_port(s7, inport); *\/ */
 /*     /\* TEST_ASSERT_EQUAL(true, is_input_port); *\/ */
 /*     /\* t = JSON_READ(inport); *\/ */

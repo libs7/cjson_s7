@@ -75,7 +75,7 @@ void int_array_ops(void) {
 
     k = s7_make_string(s7, "v");
     vec = APPLY_2("json:map-ref", root, k);
-    /* TRACE_S7_DUMP(0, "m: %s", m); */
+    /* LOG_S7_DEBUG(0, "m:", m); */
     flag = APPLY_1("json:map?", vec);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
     flag = APPLY_1("json:array?", vec);
@@ -164,7 +164,7 @@ void string_array_ops(void) {
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     res = APPLY_2("json:array-ref", vec, s7_make_integer(s7, 0));
-    TRACE_S7_DUMP(0, "res: %s", res);
+    LOG_S7_DEBUG(0, "res:", res);
     flag = APPLY_1("string?", res);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     TEST_ASSERT_EQUAL_STRING("a", s7_string(res));
@@ -284,23 +284,23 @@ void array_of_arrays(void) {
 
     // apply array
     vec2 = APPLY_OBJ(vec, s7_make_integer(s7, 0));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("json:array?", vec2);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     res = APPLY_OBJ(vec2, s7_make_integer(s7, 0));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("integer?", res);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     TEST_ASSERT_EQUAL_INT(1, s7_integer(res));
 
     vec2 = APPLY_OBJ(vec, s7_make_integer(s7, 1));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("json:array?", vec2);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     res = APPLY_OBJ(vec2, s7_make_integer(s7, 0));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("integer?", res);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     TEST_ASSERT_EQUAL_INT(3, s7_integer(res));
@@ -323,12 +323,12 @@ void array_of_maps(void) {
 
     // apply array
     m = APPLY_OBJ(vec, s7_make_integer(s7, 0));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("json:map?", m);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     res = APPLY_OBJ(m, s7_make_string(s7, "a"));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("integer?", res);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     TEST_ASSERT_EQUAL_INT(0, s7_integer(res));
@@ -338,7 +338,7 @@ void array_of_maps(void) {
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     res = APPLY_OBJ(m, s7_make_string(s7, "b"));
-    /* TRACE_S7_DUMP(0, "res: %s", res); */
+    /* LOG_S7_DEBUG(0, "res:", res); */
     flag = APPLY_1("string?", res);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     TEST_ASSERT_EQUAL_STRING("hi", s7_string(res));
@@ -375,7 +375,7 @@ void array_of_maps(void) {
 /*     /\* actual = APPLY_FORMAT("\"~A\"", jo); *\/ */
 /*     res = s7_apply_function(s7, s7_name_to_value(s7, "object->string"), */
 /*                             s7_list(s7, 1, jo)); */
-/*     TRACE_S7_DUMP(0, "obj->s: %s", res); */
+/*     LOG_S7_DEBUG(0, "obj->s:", res); */
 
 /*     /\* res = s7_apply_function(s7, s7_name_to_value(s7, "format"), *\/ */
 /*     /\*                         s7_list(s7, 3, *\/ */
@@ -383,7 +383,7 @@ void array_of_maps(void) {
 /*     /\*                                 s7_make_string(s7, "~A"), *\/ */
 /*     /\*                                 jo)); *\/ */
 /*     /\* log_debug("xxxxxxxxxxxxxxxx"); *\/ */
-/*     /\* TRACE_S7_DUMP(0, "fmt: %s", res); *\/ */
+/*     /\* LOG_S7_DEBUG(0, "fmt:", res); *\/ */
 /*     /\* TEST_ASSERT_EQUAL(s7_t(s7), actual); *\/ */
 
 /*     /\* /\\* root objects have empty key  *\\/ *\/ */
@@ -408,7 +408,7 @@ void array_of_maps(void) {
 /*     // bool arrays */
 /*     jo = JSON_READ("\"ba = [true, false]\")"); */
 /*     res = APPLY_1("object->string", jo); */
-/*     TRACE_S7_DUMP(0, "obj->s: %s", res); */
+/*     LOG_S7_DEBUG(0, "obj->s:", res); */
 /*     TEST_ASSERT_EQUAL_STRING("<#json-object ba = [true, false]>", */
 /*                              s7_string(res)); */
 /*     // int arrays */
@@ -419,21 +419,21 @@ void array_of_maps(void) {
 /*     // double arrays */
 /*     jo = JSON_READ("\"da = [1.2, 3.4]\")"); */
 /*     res = APPLY_1("object->string", jo); */
-/*     TRACE_S7_DUMP(0, "obj->s: %s", res); */
+/*     LOG_S7_DEBUG(0, "obj->s:", res); */
 /*     TEST_ASSERT_EQUAL_STRING("<#json-object da = [1.2, 3.4]>", */
 /*                              s7_string(res)); */
 
 /*     // string arrays */
 /*     jo = JSON_READ("\"sa = ['Hey there', 'you old world']\")"); */
 /*     res = APPLY_1("object->string", jo); */
-/*     TRACE_S7_DUMP(0, "obj->s: %s", res); */
+/*     LOG_S7_DEBUG(0, "obj->s:", res); */
 /*     TEST_ASSERT_EQUAL_STRING("<#json-object sa = [\"Hey there\", \"you old world\"]>", */
 /*                              s7_string(res)); */
 
 /*     /\* // timestamp arrays (not yejo) *\/ */
 /*     /\* jo = JSON_READ("\"k1 = 'Hi there'\nk2 = ', World'\")"); *\/ */
 /*     /\* res = APPLY_1("object->string", jo); *\/ */
-/*     /\* TRACE_S7_DUMP(0, "obj->s: %s", res); *\/ */
+/*     /\* LOG_S7_DEBUG(0, "obj->s:", res); *\/ */
 /*     /\* TEST_ASSERT_EQUAL_STRING("<#json-object k1 = \"Hi there\", k2 = \", World\">", *\/ */
 /*     /\*                          s7_string(res)); *\/ */
 /* } */

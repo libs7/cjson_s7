@@ -59,7 +59,7 @@ void int_array_to_vec(void)
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
-    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
+    /* LOG_S7_DEBUG(0, "actual:", actual); */
 
     sexp_str = "(hash-table :a #(1 2 3))";
     expected = EVAL(sexp_str);
@@ -108,7 +108,7 @@ void real_array_to_vec(void)
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
-    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
+    /* LOG_S7_DEBUG(0, "actual:", actual); */
 
     sexp_str = "(hash-table :a #(1.2 3.4 5.6))";
     expected = EVAL(sexp_str);
@@ -130,7 +130,7 @@ void real_array_to_vec(void)
     subvec = APPLY_2("hash-table-ref", actual, k);
     actual = APPLY_1("vector?", subvec);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    /* TRACE_S7_DUMP(0, "subvec: %s", subvec); */
+    /* LOG_S7_DEBUG(0, "subvec:", subvec); */
 
     // verify length
     val = APPLY_1("vector-length", subvec);
@@ -138,7 +138,7 @@ void real_array_to_vec(void)
 
     // verify values are reals
     val = APPLY_2("vector-ref", subvec, s7_make_integer(s7, 0));
-    /* TRACE_S7_DUMP(0, "val: %s", val); */
+    /* LOG_S7_DEBUG(0, "val:", val); */
     actual = APPLY_1("real?", val);
     TEST_ASSERT_EQUAL(s7_t(s7), actual);
     TEST_ASSERT_EQUAL_FLOAT(1.2, s7_real(val));
@@ -160,7 +160,7 @@ void bool_array_to_vec(void)
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
-    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
+    /* LOG_S7_DEBUG(0, "actual:", actual); */
 
     sexp_str = "(hash-table :a #(#t #f #t))";
     expected = EVAL(sexp_str);
@@ -182,7 +182,7 @@ void bool_array_to_vec(void)
     subvec = APPLY_2("hash-table-ref", actual, k);
     actual = APPLY_1("vector?", subvec);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    /* TRACE_S7_DUMP(0, "subvec: %s", subvec); */
+    /* LOG_S7_DEBUG(0, "subvec:", subvec); */
 
     // verify length
     val = APPLY_1("vector-length", subvec);
@@ -190,7 +190,7 @@ void bool_array_to_vec(void)
 
     // verify values are bools
     val = APPLY_2("vector-ref", subvec, s7_make_integer(s7, 0));
-    /* TRACE_S7_DUMP(0, "val: %s", val); */
+    /* LOG_S7_DEBUG(0, "val:", val); */
     actual = APPLY_1("boolean?", val);
     TEST_ASSERT_EQUAL(s7_t(s7), actual);
     TEST_ASSERT_EQUAL(s7_t(s7), val);
@@ -220,7 +220,7 @@ void null_array_to_vec(void)
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
-    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
+    /* LOG_S7_DEBUG(0, "actual:", actual); */
 
     sexp_str = "(hash-table :a #(() () ()))";
     expected = EVAL(sexp_str);
@@ -242,7 +242,7 @@ void null_array_to_vec(void)
     subvec = APPLY_2("hash-table-ref", actual, k);
     actual = APPLY_1("vector?", subvec);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    TRACE_S7_DUMP(0, "subvec: %s", subvec);
+    LOG_S7_DEBUG(0, "subvec:", subvec);
 
     // verify length
     val = APPLY_1("vector-length", subvec);
@@ -273,7 +273,7 @@ void string_array_to_vec(void)
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
-    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
+    /* LOG_S7_DEBUG(0, "actual:", actual); */
 
     sexp_str = "(hash-table :a #(\"msga\", \"msgb\", \"msgc\"))";
     expected = EVAL(sexp_str);
@@ -295,7 +295,7 @@ void string_array_to_vec(void)
     subvec = APPLY_2("hash-table-ref", actual, k);
     actual = APPLY_1("vector?", subvec);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    TRACE_S7_DUMP(0, "subvec: %s", subvec);
+    LOG_S7_DEBUG(0, "subvec:", subvec);
 
     // verify length
     val = APPLY_1("vector-length", subvec);
@@ -326,7 +326,7 @@ void mixed_array_to_vec(void)
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", actual);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
-    /* TRACE_S7_DUMP(0, "actual: %s", actual); */
+    /* LOG_S7_DEBUG(0, "actual:", actual); */
 
     sexp_str = "(hash-table :a #(1 2.3 #t () \"msga\"))";
     expected = EVAL(sexp_str);
@@ -348,7 +348,7 @@ void mixed_array_to_vec(void)
     subvec = APPLY_2("hash-table-ref", actual, k);
     actual = APPLY_1("vector?", subvec);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    TRACE_S7_DUMP(0, "subvec: %s", subvec);
+    LOG_S7_DEBUG(0, "subvec:", subvec);
 
     // verify length
     val = APPLY_1("vector-length", subvec);
@@ -385,7 +385,7 @@ void nested_int_arrays(void)
 {
     jm = JSON_READ("{\"a\": [[1, 2], [3, 4]]}");
     ht = APPLY_1("json:map->hash-table", jm);
-    TRACE_S7_DUMP(0, "ht: %s", ht);
+    LOG_S7_DEBUG(0, "ht:", ht);
     flag = APPLY_1("hash-table?", ht);
     TEST_ASSERT_TRUE(s7_boolean(s7, flag));
     flag = APPLY_1("c-pointer?", ht);
@@ -393,7 +393,7 @@ void nested_int_arrays(void)
 
     sexp_str = "(hash-table :a #( #(1 2) #(3 4) ))";
     expected = EVAL(sexp_str);
-    TRACE_S7_DUMP(0, "expected: %s", expected);
+    LOG_S7_DEBUG(0, "expected:", expected);
     flag = APPLY_1("hash-table?", expected);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
@@ -412,7 +412,7 @@ void nested_int_arrays(void)
     subvec = APPLY_2("hash-table-ref", ht, k);
     actual = APPLY_1("vector?", subvec);
     TEST_ASSERT_EQUAL(actual, s7_t(s7));
-    TRACE_S7_DUMP(0, "subvec: %s", subvec);
+    LOG_S7_DEBUG(0, "subvec:", subvec);
 
     // verify length
     val = APPLY_1("vector-length", subvec);
@@ -420,7 +420,7 @@ void nested_int_arrays(void)
 
     // verify values
     val = APPLY_2("vector-ref", subvec, s7_make_integer(s7, 0));
-    TRACE_S7_DUMP(0, "elt 0: %s", val);
+    LOG_S7_DEBUG(0, "elt 0:", val);
     actual = APPLY_1("vector?", val);
     TEST_ASSERT_EQUAL(s7_t(s7), actual);
     /* TEST_ASSERT_EQUAL_INT(1, s7_integer(val)); */
@@ -432,7 +432,7 @@ void nested_table_arrays(void)
     flag = APPLY_1("json:map?", jm);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     ht = APPLY_1("json:map->hash-table", jm);
-    /* TRACE_S7_DUMP(0, "ht: %s", ht); */
+    /* LOG_S7_DEBUG(0, "ht:", ht); */
     flag = APPLY_1("hash-table?", ht);
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
     flag = APPLY_1("c-pointer?", ht);
@@ -445,7 +445,7 @@ void nested_table_arrays(void)
     flag = APPLY_1("c-pointer?", expected);
     TEST_ASSERT_EQUAL(s7_f(s7), flag);
 
-    /* TRACE_S7_DUMP(0, "expected: %s", expected); */
+    /* LOG_S7_DEBUG(0, "expected:", expected); */
 
     flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"),
                              s7_list(s7, 2, expected, ht));
@@ -453,17 +453,17 @@ void nested_table_arrays(void)
 
     flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"),
                              s7_list(s7, 2, ht, expected));
-    /* TRACE_S7_DUMP(0, "flag: %s", flag); */
+    /* LOG_S7_DEBUG(0, "flag:", flag); */
     TEST_ASSERT_EQUAL(s7_t(s7), flag);
 
     /* expected_s7str = APPLY_1("object->string", expected); */
-    /* /\* TRACE_S7_DUMP(0, "expected s7str: %s", expected_s7str); *\/ */
-    /* /\* log_debug("expected str: %s", expected_str); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "expected s7str:", expected_s7str); *\/ */
+    /* /\* log_debug("expected str:", expected_str); *\/ */
     /* /\* TEST_ASSERT_EQUAL_STRING(sexp, s7_string(expected_str)); *\/ */
 
     /* flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"), */
     /*                          s7_list(s7, 2, actual, expected)); */
-    /* /\* TRACE_S7_DUMP(0, "flag: %s", flag); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "flag:", flag); *\/ */
     /* TEST_ASSERT_EQUAL(s7_t(s7), flag); */
 
     /* // verify value at "a" of toml-table is a toml-array */
@@ -477,16 +477,16 @@ void nested_table_arrays(void)
     /* suba = APPLY_2("hash-table-ref", actual, k); */
     /* flag = APPLY_1("vector?", suba); */
     /* TEST_ASSERT_EQUAL(s7_t(s7), flag); */
-    /* /\* TRACE_S7_DUMP(0, "suba: %s", suba); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "suba:", suba); *\/ */
     /* // compare it to expected */
     /* tmp = APPLY_2("hash-table-ref", expected, k); */
     /* flag = APPLY_1("vector?", tmp); */
     /* TEST_ASSERT_EQUAL(s7_t(s7), flag); */
-    /* /\* TRACE_S7_DUMP(0, "tmp: %s", tmp); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "tmp:", tmp); *\/ */
 
     /* flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"), */
     /*                          s7_list(s7, 2, suba, tmp)); */
-    /* /\* TRACE_S7_DUMP(0, "flag: %s", flag); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "flag:", flag); *\/ */
     /* TEST_ASSERT_EQUAL(s7_t(s7), flag); */
 
     /* // verify that mbrs of vector are hash-tables */
@@ -501,14 +501,14 @@ void nested_table_arrays(void)
 
     /* // compare to expected */
     /* tmp1 = APPLY_2("vector-ref", tmp, i0); */
-    /* /\* TRACE_S7_DUMP(0, "tmp1: %s", tmp1); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "tmp1:", tmp1); *\/ */
     /* flag = APPLY_1("hash-table?", tmp1); */
-    /* /\* TRACE_S7_DUMP(0, "flag: %s", flag); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "flag:", flag); *\/ */
     /* TEST_ASSERT_EQUAL(s7_t(s7), flag); */
 
     /* flag = s7_apply_function(s7, s7_name_to_value(s7, "equal?"), */
     /*                          s7_list(s7, 2, subt1, tmp1)); */
-    /* /\* TRACE_S7_DUMP(0, "flag: %s", flag); *\/ */
+    /* /\* LOG_S7_DEBUG(0, "flag:", flag); *\/ */
     /* TEST_ASSERT_EQUAL(s7_t(s7), flag); */
 }
 
